@@ -9,7 +9,8 @@
     "clean": "rimraf dist",
     "dev": "tsc -p tsconfig.json --watch",
     "lint": "eslint --fix .",
-    "test": "jest"
+    "test": "jest",
+    "test:watch": "jest --watch"
   },
   "devDependencies": {
     "@jest/globals": "^29.7.0",
