@@ -2,10 +2,27 @@
   "name": "@pdc-protocol/config-parser",
   "version": "0.0.1",
   "license": "MIT",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "main": "dist/cjs/index.js",
+  "types": "dist/cjs/types/index.d.ts",
+  "files": [
+    "./dist/**/*"
+  ],
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/esm/types/index.d.ts",
+        "default": "./dist/esm/index.mjs"
+      },
+      "require": {
+        "types": "./dist/cjs/types/index.d.ts",
+        "default": "./dist/cjs/index.js"
+      }
+    }
+  },
   "scripts": {
-    "build": "run-s clean && tsc -p tsconfig.build.json",
+    "build": "run-s clean && run-p build:esm build:cjs",
+    "build:esm": "tsc -p tsconfig.esm.json && mv dist/esm/index.js dist/esm/index.mjs",
+    "build:cjs": "tsc -p tsconfig.cjs.json",
     "clean": "rimraf dist",
     "dev": "tsc -p tsconfig.json --watch",
     "lint": "eslint --fix .",
