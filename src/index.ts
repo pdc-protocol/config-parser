@@ -1,65 +1,36 @@
-import {
-  DataCategoriesConfigMap,
-  DataCategoriesMap,
-  NestedDataCategoriesConfigMap,
-  PDCPConfig,
-} from './types/pdcp-config';
+import fs from 'fs';
+import { parseDocument } from 'yaml';
 
-export function getCategoriesFromConfig(doc: PDCPConfig): DataCategoriesMap {
-  const adapters = doc.adapters;
-  let categories: DataCategoriesMap = {};
-  for (const [, adapter] of Object.entries(adapters)) {
-    const data = adapter.data;
-    if (Array.isArray(data)) {
-      console.log('if array root');
-      categories = {
-        ...categories,
-        ...getCategoriesFromDataArray(data, categories),
-      };
-    } else {
-      categories = {
-        ...categories,
-        ...getCategoriesFromDataConfig(data, categories),
-      };
+import { PDCPConfig } from './types/pdcp-config';
+
+export class PDCPConfigFile {
+  config: null | PDCPConfig = null;
+
+  constructor(public configFilePath: string) { }
+
+  getProjectsNames(): Array<string> {
+    if (this.config === null) {
+      throw Error('Error: config is null');
     }
+    return Object.keys(this.config.projects);
   }
-  return categories;
-}
 
-export function getCategoriesFromDataArray<T>(
-  data: NestedDataCategoriesConfigMap<T>,
-  currentCategories: DataCategoriesMap,
-): DataCategoriesMap {
-  let categories = {};
-  data.forEach((element) => {
-    if (Array.isArray(element)) {
-      console.log('if array');
-      categories = {
-        ...categories,
-        ...getCategoriesFromDataArray(element, currentCategories),
-      };
-    } else {
-      categories = {
-        ...categories,
-        ...getCategoriesFromDataConfig(element, currentCategories),
-      };
-    }
-  });
-  return categories;
-}
-
-export function getCategoriesFromDataConfig<T>(
-  data: DataCategoriesConfigMap<T>,
-  currentCategories: DataCategoriesMap,
-): DataCategoriesMap {
-  console.log('getCategoriesFromDataConfig');
-  const categories: DataCategoriesMap = {};
-  for (const category in data) {
-    if (currentCategories[category] !== undefined) {
-      throw new Error('Category ' + category + ' already defined');
-    }
-    categories[category] = {};
-    console.log('categories', categories);
+  // isPDCPConfig(obj: any | PDCPConfig): obj is PDCPConfig {
+  //   return;
+  // }
+  //YAML to JSON string ou fichier
+  async parse() {
+    await fs.promises
+      .readFile(this.configFilePath, 'utf8')
+      .then((data) => {
+        const doc = parseDocument(data);
+        this.config = doc.toJS(); //any a la place de PDCP / 'class validator' ?
+        if (this.config && !('projects' in this.config)) {
+          throw new Error(`file: ${this.configFilePath} has no projects`);
+        }
+      })
+      .catch((err) => {
+        throw new Error(err.message);
+      });
   }
-  return categories;
 }
