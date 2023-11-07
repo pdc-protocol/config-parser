@@ -3,9 +3,7 @@ import { PDCPConfig } from './types/pdcp-config';
 
 describe('getProjectsNames', () => {
   it('should return the right data', () => {
-    const front = new PDCPConfigFile(
-      '/home/abijuduval/pdcp-server/src/configFront.yaml',
-    );
+    const front = new PDCPConfigFile();
     front.config = config;
     const res: Array<string> = front.getProjectsNames();
     expect(res).toEqual(['cool-site', 'site-du-lab']);
@@ -13,28 +11,28 @@ describe('getProjectsNames', () => {
 });
 describe('getProjectsNames', () => {
   it('expect to throw when config is null', () => {
-    const front = new PDCPConfigFile(
-      '/home/abijuduval/pdcp-server/src/configFront.yaml',
-    );
+    const front = new PDCPConfigFile();
     front.config = null;
     expect(() => front.getProjectsNames()).toThrow();
   });
 });
 describe('parse', () => {
   it('expect to throw when readFile error', async () => {
-    const front = new PDCPConfigFile(
-      '/error/home/abijuduval/pdcp-server/src/configFront.yaml',
-    );
-    await expect(() => front.parse()).rejects.toThrow();
+    const front = new PDCPConfigFile();
+    await expect(() =>
+      front.parseFromFile(
+        '/error/home/abijuduval/pdcp-server/src/configFront.yaml',
+      ),
+    ).rejects.toThrow();
   });
 });
 describe('parse', () => {
   it('expect to throw when yaml is not a PDCPConfigFile', async () => {
-    const front = new PDCPConfigFile(
-      '/home/abijuduval/config-parser/docker-compose.yml',
-    );
+    const front = new PDCPConfigFile();
     // await front.parse();
-    await expect(() => front.parse()).rejects.toThrow();
+    await expect(() =>
+      front.parseFromFile('/home/abijuduval/config-parser/docker-compose.yml'),
+    ).rejects.toThrow();
   });
 });
 
