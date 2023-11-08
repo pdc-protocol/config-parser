@@ -1,3 +1,5 @@
+import * as fs from 'fs';
+
 import { PDCPConfigFile } from './index';
 import { PDCPConfig } from './types/pdcp-config';
 
@@ -16,7 +18,7 @@ describe('getProjectsNames', () => {
     expect(() => front.getProjectsNames()).toThrow();
   });
 });
-describe('parse', () => {
+describe('parseFromFile', () => {
   it('expect to throw when readFile error', async () => {
     const front = new PDCPConfigFile();
     await expect(() =>
@@ -26,13 +28,38 @@ describe('parse', () => {
     ).rejects.toThrow();
   });
 });
-describe('parse', () => {
+describe('parseFromFile', () => {
   it('expect to throw when yaml is not a PDCPConfigFile', async () => {
     const front = new PDCPConfigFile();
-    // await front.parse();
     await expect(() =>
       front.parseFromFile('/home/abijuduval/config-parser/docker-compose.yml'),
     ).rejects.toThrow();
+  });
+});
+describe('parseFromString', () => {
+  it('expect to resolve', async () => {
+    const front = new PDCPConfigFile();
+    await expect(() =>
+      front.parseFromString(
+        fs.promises.readFile(
+          '/home/abijuduval/pdcp-server/src/configFront.yaml',
+          'utf8',
+        ),
+      ),
+    ).resolves;
+  });
+});
+describe('parseFromString', () => {
+  it('expect to throw when there are no projects in the config', async () => {
+    const front = new PDCPConfigFile();
+    await expect(() =>
+      front.parseFromString(
+        fs.readFileSync(
+          '/home/abijuduval/config-parser/src/docker-compose.yml',
+          'utf8',
+        ),
+      ),
+    ).rejects.toThrow(`config has no projects`);
   });
 });
 
