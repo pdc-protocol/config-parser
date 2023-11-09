@@ -1,6 +1,6 @@
 {
   "name": "@pdc-protocol/config-parser",
-  "version": "0.0.1",
+  "version": "0.0.1-canary-2e29b23",
   "license": "MIT",
   "main": "dist/cjs/index.js",
   "types": "dist/cjs/types/index.d.ts",
@@ -24,7 +24,7 @@
     "build:esm": "tsc -p tsconfig.esm.json && mv dist/esm/index.js dist/esm/index.mjs",
     "build:cjs": "tsc -p tsconfig.cjs.json",
     "clean": "rimraf dist",
-    "dev": "tsc -p tsconfig.json --watch",
+    "dev": "tsc -p tsconfig.esm.json --watch",
     "lint": "eslint --fix .",
     "test": "jest",
     "test:watch": "jest --watch"
