@@ -3,63 +3,62 @@ import * as fs from 'fs';
 import { PDCPConfigFile } from './index';
 import { PDCPConfig } from './types/pdcp-config';
 
-describe('getProjectsNames', () => {
-  it('should return the right data', () => {
-    const front = new PDCPConfigFile();
-    front.config = config;
-    const res: Array<string> = front.getProjectsNames();
-    expect(res).toEqual(['cool-site', 'site-du-lab']);
+describe('PDCPConfigFile', () => {
+  let front;
+  beforeEach(() => {
+    front = new PDCPConfigFile();
   });
-});
-describe('getProjectsNames', () => {
-  it('expect to throw when config is null', () => {
-    const front = new PDCPConfigFile();
-    front.config = null;
-    expect(() => front.getProjectsNames()).toThrow();
+
+  describe('getProjectsNames', () => {
+    it('should return the right data', () => {
+      front.config = config;
+      const res: Array<string> = front.getProjectsNames();
+      expect(res).toEqual(['cool-site', 'site-du-lab']);
+    });
+    it('expect to throw when config is null', () => {
+      front.config = null;
+      expect(() => front.getProjectsNames()).toThrow();
+    });
   });
-});
-describe('parseFromFile', () => {
-  it('expect to throw when readFile error', async () => {
-    const front = new PDCPConfigFile();
-    await expect(() =>
-      front.parseFromFile(
-        '/error/home/abijuduval/pdcp-server/src/configFront.yaml',
-      ),
-    ).rejects.toThrow();
-  });
-});
-describe('parseFromFile', () => {
-  it('expect to throw when yaml is not a PDCPConfigFile', async () => {
-    const front = new PDCPConfigFile();
-    await expect(() =>
-      front.parseFromFile('/home/abijuduval/config-parser/docker-compose.yml'),
-    ).rejects.toThrow();
-  });
-});
-describe('parseFromString', () => {
-  it('expect to resolve', async () => {
-    const front = new PDCPConfigFile();
-    await expect(() =>
-      front.parseFromString(
-        fs.promises.readFile(
-          '/home/abijuduval/pdcp-server/src/configFront.yaml',
-          'utf8',
+
+  describe('parseFromFile', () => {
+    it('expect to throw when yaml is not a PDCPConfigFile', async () => {
+      await expect(() =>
+        front.parseFromFile(
+          '/home/abijuduval/config-parser/docker-compose.yml',
         ),
-      ),
-    ).resolves;
-  });
-});
-describe('parseFromString', () => {
-  it('expect to throw when there are no projects in the config', async () => {
-    const front = new PDCPConfigFile();
-    await expect(() =>
-      front.parseFromString(
-        fs.readFileSync(
-          '/home/abijuduval/config-parser/src/docker-compose.yml',
-          'utf8',
+      ).rejects.toThrow();
+    });
+    it('expect to throw when readFile error', async () => {
+      await expect(() =>
+        front.parseFromFile(
+          '/error/home/abijuduval/pdcp-server/src/configFront.yaml',
         ),
-      ),
-    ).rejects.toThrow(`config has no projects`);
+      ).rejects.toThrow();
+    });
+  });
+
+  describe('parseFromString', () => {
+    it('expect to resolve', async () => {
+      await expect(() =>
+        front.parseFromString(
+          fs.promises.readFile(
+            '/home/abijuduval/pdcp-server/src/configFront.yaml',
+            'utf8',
+          ),
+        ),
+      ).resolves;
+    });
+    it('expect to throw when there are no projects in the config', async () => {
+      await expect(() =>
+        front.parseFromString(
+          fs.readFileSync(
+            '/home/abijuduval/config-parser/src/docker-compose.yml',
+            'utf8',
+          ),
+        ),
+      ).rejects.toThrow(`config has no projects`);
+    });
   });
 });
 
@@ -154,262 +153,3 @@ const config: PDCPConfig = {
   //   },
   // },
 };
-
-/***************************************************************************/
-// describe('getDataFromProjects', () => {
-//   it('should return the right data', () => {
-//     const parser = new PDCPParser(
-//       '/home/abijuduval/pdcp-server/src/configFront.yaml',
-//     );
-//     parser.doc = {
-//   {
-//       projects:
-//       {
-//         "cool-site":
-//         {
-//           data:
-//           {
-//             prenom: {
-//               fetch:
-//               adapter: {database}
-//               purposes: {[personalization]}
-//             }
-//             nom: {
-//               fetch:
-//               adapter: database
-//               purposes: [personalization]
-//             },
-//           },
-//         },
-//       },
-//     },
-//   }
-//     const res = parser.getProjectNamesFromConfig();
-//   expect(res).toThrow();
-// });
-// });
-
-// it.each<{ input: PDCPConfig; output: DataCategoriesMap }>([
-//   {
-//     input: {
-//       adapters: {
-//         postgres: {
-//           data: {
-//             first_name: { column: 'first_name' },
-//             last_name: { column: 'last_name' },
-//           },
-//         },
-//       },
-//     },
-//     output: {
-//       first_name: {},
-//       last_name: {},
-//     },
-//   },
-//   {
-//     input: {
-//       adapters: {
-//         filesystem: {
-//           data: { profile_picture: { path: '/pathketuveux' } },
-//         },
-//         postgres: {
-//           data: {
-//             first_name: { column: 'first_name' },
-//             last_name: { column: 'last_name' },
-//           },
-//         },
-//       },
-//     },
-//     output: {
-//       first_name: {},
-//       last_name: {},
-//       profile_picture: {},
-//     },
-//   },
-//   {
-//     input: {
-//       adapters: {
-//         postgres: {
-//           data: [
-//             {
-//               first_name: { column: 'first_name' },
-//               last_name: { column: 'last_name' },
-//             },
-//             {
-//               profile_picture_path: { column: 'profile_picture_path' },
-//             },
-//           ],
-//         },
-//       },
-//     },
-//     output: {
-//       first_name: {},
-//       last_name: {},
-//       profile_picture_path: {},
-//     },
-//   },
-//   {
-//     input: {
-//       adapters: {
-//         postgres: {
-//           data: [
-//             [
-//               [
-//                 {
-//                   first_name: { column: 'first_name' },
-//                 },
-//                 {
-//                   last_name: { column: 'last_name' },
-//                 },
-//               ],
-//               {
-//                 profile_picture_path: { column: 'profile_picture_path' },
-//               },
-//             ],
-//           ],
-//         },
-//       },
-//     },
-//     output: {
-//       first_name: {},
-//       last_name: {},
-//       profile_picture_path: {},
-//     },
-//   },
-//   // {
-//   //   input: {
-//   //     adapters: {
-//   //       postgres: {
-//   //         data: [
-//   //           {
-//   //             $extends: 'user',
-//   //             first_name: { column: 'first_name' },
-//   //             last_name: { column: 'last_name' },
-//   //           },
-//   //           {
-//   //             profile_picture_path: { column: 'profile_picture_path' },
-//   //           },
-//   //         ],
-//   //       },
-//   //     },
-//   //   },
-//   //   output: {
-//   //     first_name: {},
-//   //     last_name: {},
-//   //     profile_picture_path: {},
-//   //   },
-//   // },
-// ])('should return the right data ($input, $output)', ({ input, output }) => {
-//   const res = getCategoriesFromConfig(input);
-//   expect(res).toEqual(output);
-// });
-
-// describe('when there is a duplicate key', () => {
-//   it('should throw an error', () => {
-//     expect(() =>
-//       getCategoriesFromConfig({
-//         adapters: {
-//           mysql: {
-//             data: { first_name: { column: 'first_name' } },
-//           },
-//           postgres: {
-//             data: {
-//               first_name: { column: 'first_name' },
-//               last_name: { column: 'last_name' },
-//             },
-//           },
-//         },
-//       }),
-//     ).toThrow();
-//   });
-// });
-// describe('when there is a duplicate key', () => {
-//   it('should throw an error', () => {
-//     expect(() =>
-//       getCategoriesFromConfig({
-//         adapters: {
-//           mysql: {
-//             data: { first_name: { column: 'first_name' } },
-//           },
-//           postgres: {
-//             data: [
-//               {
-//                 first_name: { column: 'first_name' },
-//                 last_name: { column: 'last_name' },
-//               },
-//               {
-//                 profile_picture_path: { column: 'profile_picture_path' },
-//               },
-//             ],
-//           },
-//         },
-//       }),
-//     ).toThrow();
-//   });
-// });
-// describe('when there is a duplicate key', () => {
-//   it('should throw an error', () => {
-//     expect(() =>
-//       getCategoriesFromConfig({
-//         adapters: {
-//           mysql: {
-//             data: { full_name: { column: 'full_name' } },
-//           },
-//           postgres: {
-//             data: [
-//               {
-//                 first_name: { column: 'first_name' },
-//                 last_name: { column: 'last_name' },
-//               },
-//               {
-//                 first_name: {},
-//                 profile_picture_path: { column: 'profile_picture_path' },
-//               },
-//             ],
-//           },
-//         },
-//       }),
-//     ).toThrow();
-//   });
-// });
-// });
-
-//         expect(() =>
-//           getCategoriesFromConfig({
-//             adapters: {
-//               mysql: {
-//                 data: { first_name: { column: 'first_name' } },
-//               },
-//               postgres: {
-//                 data: {
-//                   first_name: { column: 'first_name' },
-//                   last_name: { column: 'last_name' },
-//                 },
-//               },
-//             },
-//           }),
-//         ).toThrow();
-//       })();
-
-//       (() => {
-//         expect(() =>
-//           service.getCategoriesFromConfig({
-//             adapters: {
-//               postgres: {
-//                 data: [
-//                   {
-//                     first_name: { column: 'first_name' },
-//                     last_name: { column: 'last_name' },
-//                   },
-//                   {
-//                     profile_picture_path: { column: 'profile_picture_path' },
-//                   },
-//                 ],
-//               },
-//             },
-//           }),
-//         ).toThrow();
-//       })();
-//     });
-//   });
-// });
